@@ -5,6 +5,7 @@ const CITY_COUNT: usize = 6;
 const MAP_WIDTH: u16 = 100;
 
 const IS_DEBUG: bool = true;
+const SHOW_ALL_TRAVERSALS: bool = false;
 const GRAPH_PIXELS: usize = 50;
 
 // https://tspvis.com/
@@ -53,12 +54,17 @@ fn traverse(visited: Vec<usize>, pending: Vec<usize>, mut min: f32, grid: &Vec<V
             total_distance += grid[a_city][b_city];
         }
 
+        if IS_DEBUG && SHOW_ALL_TRAVERSALS {
+            display_path(&visited);
+        }
         if total_distance < min {
             min = total_distance;
 
             if IS_DEBUG {
-                print!("New min: {min}\t\t\t");
-                display_path(&visited);
+                if !SHOW_ALL_TRAVERSALS {
+                    display_path(&visited);
+                }
+                println!("\t\t\tNew min: {min}");
             }
         }
 
