@@ -1,5 +1,6 @@
 use core::f32;
 use rand::Rng;
+use std::time::Instant;
 
 const CITY_COUNT: usize = 6;
 const MAP_WIDTH: u16 = 100;
@@ -7,6 +8,7 @@ const MAP_WIDTH: u16 = 100;
 const SHOW_PLOT: bool = true;
 
 const IS_DEBUG: bool = true;
+const MEASURE_TIMING: bool = true;
 const SHOW_ALL_TRAVERSALS: bool = false;
 const GRAPH_PIXELS: usize = 50;
 
@@ -27,7 +29,14 @@ fn main() {
 fn brute_force(grid: Vec<Vec<f32>>) -> f32 {
     let n = grid.len();
 
-    traverse(vec![0], (1..n).collect(), f32::MAX, &grid)
+    let start: Instant = Instant::now();
+    let min = traverse(vec![0], (1..n).collect(), f32::MAX, &grid);
+    if MEASURE_TIMING {
+        let duration = start.elapsed();
+        println!("Took {duration:?}");
+    }
+
+    min
 }
 
 fn traverse(visited: Vec<usize>, pending: Vec<usize>, mut min: f32, grid: &Vec<Vec<f32>>) -> f32 {
