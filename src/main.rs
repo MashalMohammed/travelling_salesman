@@ -6,11 +6,11 @@ const CITY_COUNT: usize = 6;
 const MAP_WIDTH: u16 = 100;
 
 const SHOW_PLOT: bool = true;
-
-const IS_DEBUG: bool = true;
 const MEASURE_TIMING: bool = true;
-const SHOW_ALL_TRAVERSALS: bool = false;
 const GRAPH_PIXELS: usize = 50;
+
+const IS_DEBUG: bool = false; // this flag has performance cost when true
+const SHOW_ALL_TRAVERSALS: bool = false;
 
 // https://tspvis.com/
 // https://www.routific.com/
@@ -19,13 +19,21 @@ const GRAPH_PIXELS: usize = 50;
 // https://www.optaplanner.org/
 fn main() {
     let points = generate_points(CITY_COUNT, MAP_WIDTH);
+    if IS_DEBUG || SHOW_PLOT {
+        display_plot(&points);
+    }
+
     let grid = calculate_edge_grid(points);
+    if IS_DEBUG {
+        display_grid(&grid);
+    }
+
     let min_total_dist = brute_force(grid);
 
     println!("Optimal path length: {min_total_dist}");
 }
 
-// (n-1)!/2
+// (n-2)!
 fn brute_force(grid: Vec<Vec<f32>>) -> f32 {
     let n = grid.len();
 
@@ -45,8 +53,12 @@ fn traverse(visited: Vec<usize>, pending: Vec<usize>, mut min: f32, grid: &Vec<V
         for i in 0..pending.len() {
             let mut future_visit = visited.clone();
             future_visit.push(pending[i]);
-            
-            let future_available: Vec<usize> = pending.iter().filter(|x| **x != pending[i]).map(|x| x.to_owned()).collect();
+
+            let future_available: Vec<usize> = pending
+                .iter()
+                .filter(|x| **x != pending[i])
+                .map(|x| x.to_owned())
+                .collect();
             let local_min = traverse(future_visit, future_available, min, &grid);
             if local_min < min {
                 min = local_min
@@ -57,11 +69,11 @@ fn traverse(visited: Vec<usize>, pending: Vec<usize>, mut min: f32, grid: &Vec<V
     } else {
         let n = visited.len();
         let first_ix = visited[0];
-        let last_ix = visited[n-1];
+        let last_ix = visited[n - 1];
         let mut total_distance = grid[first_ix][last_ix];
-        for i in 0..n-1 {
+        for i in 0..n - 1 {
             let a_city = visited[i];
-            let b_city = visited[i+1];
+            let b_city = visited[i + 1];
             total_distance += grid[a_city][b_city];
         }
 
@@ -89,7 +101,7 @@ fn calculate_edge_grid(points: Vec<Point>) -> Vec<Vec<f32>> {
     let mut grid = vec![vec![0 as f32; n]; n];
 
     for i in 0..n {
-        for j in i+1..n {
+        for j in i + 1..n {
             let dx = points[i].x as i16 - points[j].x as i16;
             let dy = points[i].y as i16 - points[j].y as i16;
             grid[i][j] = ((dx * dx + dy * dy) as f32).sqrt();
@@ -97,26 +109,18 @@ fn calculate_edge_grid(points: Vec<Point>) -> Vec<Vec<f32>> {
         }
     }
 
-    if IS_DEBUG {
-        display_grid(&grid);
-    }
-    
     grid
 }
 
 /// Generates dataset: (x, y) co-ordinates for n cities, in a space of area = width * width
 fn generate_points(n: usize, width: u16) -> Vec<Point> {
-    let mut points = vec![Point { x: 0, y: 0}; n];
+    let mut points = vec![Point { x: 0, y: 0 }; n];
 
     for i in 0..n {
         let xi: u16 = rand::thread_rng().gen_range(0..width);
         let yi: u16 = rand::thread_rng().gen_range(0..width);
         points[i].x = xi;
         points[i].y = yi;
-    }
-
-    if IS_DEBUG || SHOW_PLOT {
-        display_plot(&points);
     }
 
     points
@@ -156,9 +160,12 @@ fn display_plot(points: &Vec<Point>) {
 
     // points
     for i in 0..n {
-        let ix = (points[i].x/scale_factor as u16) as usize;
-        let iy = (points[i].y/scale_factor as u16) as usize;
-        println!("City {i}: ({}, {})        ({}, {}) ", points[i].x, points[i].y, ix, iy);
+        let ix = (points[i].x / scale_factor as u16) as usize;
+        let iy = (points[i].y / scale_factor as u16) as usize;
+        println!(
+            "City {i}: ({}, {})        ({}, {}) ",
+            points[i].x, points[i].y, ix, iy
+        );
         plot[ix][iy] = format!("{i:>2}");
     }
 
@@ -172,7 +179,7 @@ fn display_plot(points: &Vec<Point>) {
     for j in 0..GRAPH_PIXELS {
         print!("|");
         for i in 0..GRAPH_PIXELS {
-            print!("{}", plot[i][GRAPH_PIXELS-1-j]);
+            print!("{}", plot[i][GRAPH_PIXELS - 1 - j]);
         }
         print!("|\n");
     }
@@ -186,12 +193,12 @@ fn display_plot(points: &Vec<Point>) {
 fn display_path(path: &Vec<usize>) {
     let pattern: Vec<String> = path.iter().map(|x| x.to_string()).collect();
     let pattern = pattern.join(" > ");
-    // dbg!(pattern);
+
     println!("path: {pattern} > {}", path[0]);
 }
 
 #[derive(Clone)]
 struct Point {
     x: u16,
-    y: u16
+    y: u16,
 }
