@@ -4,6 +4,8 @@ use rand::Rng;
 const CITY_COUNT: usize = 6;
 const MAP_WIDTH: u16 = 100;
 
+const SHOW_PLOT: bool = true;
+
 const IS_DEBUG: bool = true;
 const SHOW_ALL_TRAVERSALS: bool = false;
 const GRAPH_PIXELS: usize = 50;
@@ -104,7 +106,7 @@ fn generate_points(n: usize, width: u16) -> Vec<Point> {
         points[i].y = yi;
     }
 
-    if IS_DEBUG {
+    if IS_DEBUG || SHOW_PLOT {
         display_plot(&points);
     }
 
