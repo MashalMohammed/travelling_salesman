@@ -25,7 +25,7 @@ fn main() {
 fn brute_force(grid: Vec<Vec<f32>>) -> f32 {
     let n = grid.len();
 
-    traverse(vec![], (0..n).collect(), f32::MAX, &grid)
+    traverse(vec![0], (1..n).collect(), f32::MAX, &grid)
 }
 
 fn traverse(visited: Vec<usize>, pending: Vec<usize>, mut min: f32, grid: &Vec<Vec<f32>>) -> f32 {
