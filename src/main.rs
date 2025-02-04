@@ -17,6 +17,9 @@ const SHOW_ALL_TRAVERSALS: bool = false;
 // https://www.math.uwaterloo.ca/tsp/app/diy.html?
 // https://getcircuit.com/
 // https://www.optaplanner.org/
+// https://dspace.mit.edu/handle/1721.1/131235 - Technical Proceedings of the Amazon Last Mile Routing Research Challenge
+// https://arxiv.org/abs/2112.15192 - Paper - Constrained Local Search for Last-Mile Routing
+// https://www.math.uwaterloo.ca/tsp/amz/index.html
 fn main() {
     let points = generate_points(CITY_COUNT, MAP_WIDTH);
     if IS_DEBUG || SHOW_PLOT {
